@@ -1,0 +1,21 @@
+# (Optional) name of the workflow as appears in the Actions tab of the GitHub repo.
+name: learn-github-actions
+# Trigger: "push" event - triggered when someone pushes a change or merges a PR on any
+# branch.
+on: [push]
+jobs:  # Groups together all the jobs that run in the workflow.
+  check-bats-version:    # A job. Child keys define properties of the job.
+    runs-on: ubuntu-latest  # Runner
+    steps:  # Groups together all the steps.
+      # uses: this step will run `v3` of the `actions/checkout` action.
+      # Checks out your repo onto the runner, allowing scripts or other actions to run
+      # against your code (such as build and test tools).
+      - uses: actions/checkout@v3
+      # Uses the `actions/setup-node@v3` action to install Node.js v14. Puts both the
+      # node and npm commands in your PATH.
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      # run: tells the job to execute a command on the runner.
+      - run: npm install -g bats
+      - run: bats -v
