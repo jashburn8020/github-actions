@@ -2,8 +2,6 @@
 
 ## Understanding GitHub Actions
 
-### Overview
-
 - Continuous integration and continuous delivery (CI/CD) platform
   - automate your build, test, and deployment pipeline
   - create workflows that build and test every pull request to your repository, or deploy merged pull requests to production
@@ -88,4 +86,79 @@
 - When your workflow is triggered, a **workflow run** is created that executes the workflow
 - You can see a visualization graph of the run's progress and view each step's activity
 
-## Sources
+### Sources
+
+- "Understanding GitHub Actions - GitHub Docs." GitHub Docs, 2022, [docs.github.com/en/actions/learn-github-actions/understanding-github-actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions). Accessed 4 June 2022.
+
+## Finding and customizing actions
+
+- The actions you use in your workflow can be defined in:
+  - the same repository as your workflow file
+  - any public repository
+  - a published Docker container image on Docker Hub
+- [GitHub Marketplace](https://github.com/marketplace/actions/) is a central location for you to find actions created by the GitHub community
+
+### Adding an action to your workflow
+
+#### Adding an action from the same repository
+
+- Reference the action with either the ‌`{owner}/{repo}@{ref}` or `./path/to/dir` syntax
+- Example repository file structure:
+
+```text
+|-- hello-world (repository)
+|   |__ .github
+|       └── workflows
+|           └── my-first-workflow.yml
+|       └── actions
+|           |__ hello-world-action
+|               └── action.yml
+```
+
+- Example workflow file:
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # This step checks out a copy of your repository.
+      - uses: actions/checkout@v3
+      # This step references the directory that contains the action.
+      - uses: ./.github/actions/hello-world-action
+```
+
+#### Adding an action from a different repository
+
+- Reference the action with the `{owner}/{repo}@{ref}` syntax
+  - must be stored in a public repository
+
+```yml
+jobs:
+  my_first_job:
+    steps:
+      - name: My first step
+        uses: actions/setup-node@v3
+```
+
+#### Referencing a container on Docker Hub
+
+- Reference the action with the `docker://{image}:{tag}` syntax
+
+```yml
+jobs:
+  my_first_job:
+    steps:
+      - name: My first step
+        uses: docker://alpine:3.8
+```
+
+### Using release management for your custom actions
+
+- Tags: `uses: actions/javascript-action@v1.0.1`
+- SHAs: `uses: actions/javascript-action@172239021f7ba04fe7327647b213799853a9eb89`
+- Branches: `uses: actions/javascript-action@main`
+
+### Sources
+
+- "Finding and Customizing Actions - GitHub Docs." GitHub Docs, 2022, [docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions). Accessed 5 June 2022.
