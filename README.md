@@ -81,7 +81,7 @@
 - GitHub Actions uses YAML syntax to define the workflow
 - Each workflow is stored as a separate YAML file in your code repository
   - in a directory named **`.github/workflows`**
-- See [workflows/learn-github-actions.yml]
+- See [`workflows/learn-github-actions.yml`](workflows/learn-github-actions.yml)
 
 ### Viewing the activity for a workflow run
 
