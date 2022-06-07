@@ -4,6 +4,7 @@ jobs:
   do-greeting:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/simple-input-action
       - name: Send greeting
         run: echo "${{ github.event.inputs.greeting }} world!"
