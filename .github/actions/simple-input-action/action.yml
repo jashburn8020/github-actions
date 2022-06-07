@@ -1,7 +1,0 @@
-name: "Simple input action"
-description: "Demonstrate a custom action that only accepts an input"
-inputs:
-  greeting: # id of input
-    description: "The greeting to use"
-    required: true
-    default: "hello"
