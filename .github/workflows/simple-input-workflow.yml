@@ -1,0 +1,8 @@
+name: simple-input-workflow
+on: workflow_dispatch
+jobs:
+  do-greeting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send greeting
+        run: echo "${{ github.event.inputs.greeting }} world!"
