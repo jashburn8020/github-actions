@@ -1,0 +1,15 @@
+name: Environment variables
+on:
+  workflow_dispatch
+env:  # Environment variable scope: entire workflow
+  DAY_OF_WEEK: Monday
+jobs:
+  greeting_job:
+    runs-on: ubuntu-latest
+    env:  # Environment variable scope: job
+      GREETING: Hello
+    steps:
+      - name: "Greeting"
+        run: echo "$GREETING $FIRST_NAME. Today is $DAY_OF_WEEK!"
+        env:  # Environment variable scope: step
+          FIRST_NAME: Mona

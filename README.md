@@ -162,3 +162,23 @@ jobs:
 ### Sources
 
 - "Finding and Customizing Actions - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions](https://docs.github.com/en/actions/learn-github-actions/finding-and-customizing-actions). Accessed 5 June 2022.
+
+## Essential features of GitHub Actions
+
+### Using variables in your workflows
+
+- GitHub Actions include default environment variables for each workflow run
+- To use custom environment variables
+  - set in your YAML workflow file
+
+```yml
+jobs:
+  example-job:
+    steps:
+      - name: Connect to PostgreSQL
+        run: node client.js
+        env:
+          #
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+```
