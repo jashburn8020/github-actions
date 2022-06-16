@@ -167,18 +167,12 @@ jobs:
 
 ### Using variables in your workflows
 
-- GitHub Actions include default environment variables for each workflow run
+- GitHub Actions include [default environment variables](https://docs.github.com/en/actions/learn-github-actions/environment-variables#default-environment-variables) for each workflow run
 - To use custom environment variables
   - set in your YAML workflow file
+  - see [`.github/workflows/env-vars.yml`](.github/workflows/env-vars.yml)
 
-```yml
-jobs:
-  example-job:
-    steps:
-      - name: Connect to PostgreSQL
-        run: node client.js
-        env:
-          #
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
-```
+### Adding scripts to your workflow
+
+- You can use actions to run scripts and shell commands, which are then executed on the assigned runner
+- See [`.github/workflows/script-in-workflow.yml`](.github/workflows/script-in-workflow.yml)

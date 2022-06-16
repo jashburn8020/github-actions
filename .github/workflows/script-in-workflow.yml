@@ -1,0 +1,12 @@
+name: Script in workflow
+on:
+  workflow_dispatch
+jobs:
+  greeting_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Greeting
+        run: ./.github/scripts/greeting.sh
+        shell: bash
+        env:
+          NAME: Mona
