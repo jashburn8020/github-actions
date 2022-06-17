@@ -176,3 +176,23 @@ jobs:
 
 - You can use actions to run scripts and shell commands, which are then executed on the assigned runner
 - See [`.github/workflows/script-in-workflow.yml`](.github/workflows/script-in-workflow.yml)
+
+### Sharing data between jobs
+
+- Store files in GitHub as _artifacts_
+  - if your job generates files that you want to share with another job in the same workflow
+  - if you want to save the files for later reference
+- Artifacts: files created when you build and test your code
+  - binary or package files, test results, screenshots, log files
+- Artifacts are associated with the workflow run where they were created and can be used by another job
+- All actions and workflows called within a run have write access to that run's artifacts
+- You can use the [`upload-artifact` action](https://github.com/actions/upload-artifact) to upload artifacts
+- The [`download-artifact` action](https://github.com/actions/download-artifact) can be used to download previously uploaded artifacts during a workflow run
+- You can use the `upload-artifact` and `download-artifact` actions to share data between jobs in a workflow
+  - to download an artifact from the same workflow run, your download job should specify `needs:` _`upload-job-name`_ so it doesn't start until the upload job finishes
+- See [`.github/workflows/passing-data.yml`](.github/workflows/passing-data.yml)
+
+### Sources
+
+- "Essential Features of GitHub Actions - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/learn-github-actions/essential-features-of-github-actions](https://docs.github.com/en/actions/learn-github-actions/essential-features-of-github-actions). Accessed 17 June 2022.
+- "Storing Workflow Data as Artifacts - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts). Accessed 17 June 2022.
