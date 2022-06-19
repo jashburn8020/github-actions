@@ -1,5 +1,34 @@
 # GitHub Actions
 
+- [GitHub Actions](#github-actions)
+  - [Understanding GitHub Actions](#understanding-github-actions)
+    - [The components of GitHub Actions](#the-components-of-github-actions)
+      - [Workflows](#workflows)
+      - [Events](#events)
+      - [Jobs](#jobs)
+      - [Actions](#actions)
+      - [Runners](#runners)
+    - [Create an example workflow](#create-an-example-workflow)
+    - [Viewing the activity for a workflow run](#viewing-the-activity-for-a-workflow-run)
+    - [Sources](#sources)
+  - [Finding and customizing actions](#finding-and-customizing-actions)
+    - [Adding an action to your workflow](#adding-an-action-to-your-workflow)
+      - [Adding an action from the same repository](#adding-an-action-from-the-same-repository)
+      - [Adding an action from a different repository](#adding-an-action-from-a-different-repository)
+      - [Referencing a container on Docker Hub](#referencing-a-container-on-docker-hub)
+    - [Using release management for your custom actions](#using-release-management-for-your-custom-actions)
+    - [Sources](#sources-1)
+  - [Essential features of GitHub Actions](#essential-features-of-github-actions)
+    - [Using variables in your workflows](#using-variables-in-your-workflows)
+    - [Adding scripts to your workflow](#adding-scripts-to-your-workflow)
+    - [Sharing data between jobs](#sharing-data-between-jobs)
+    - [Sources](#sources-2)
+  - [About workflows](#about-workflows)
+    - [Using starter workflows](#using-starter-workflows)
+    - [Advanced workflow features](#advanced-workflow-features)
+      - [Storing secrets](#storing-secrets)
+    - [Sources](#sources-3)
+
 ## Understanding GitHub Actions
 
 - Continuous integration and continuous delivery (CI/CD) platform
@@ -29,11 +58,16 @@
     - manually
     - at a defined schedule
 - Defined in the **`.github/workflows`** directory in a repository
+- A workflow must contain the following basic components:
+  - one or more **events** that will trigger the workflow
+  - one or more **jobs**, each of which will execute on a runner machine and run a series of one or more steps
+  - each **step** can either run a script that you define or run an action
 - A repository can have multiple workflows
   - build and test pull requests
   - deploy your application every time a release is created
   - add a label every time someone opens a new issue
 - You can reference a workflow within another workflow
+- See [Workflow syntax for GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
 
 #### Events
 
@@ -44,8 +78,9 @@
   - pushes a commit to a repository
 - You can also trigger a workflow run
   - on a schedule
-  - by posting to a REST API
+  - by posting to a REST API (triggers a [`repository_dispatch`](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#repository_dispatch) event)
   - manually
+- See [Triggering a workflow](https://docs.github.com/en/actions/using-workflows/triggering-a-workflow) and [Events that trigger workflows](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows)
 
 #### Jobs
 
@@ -89,6 +124,7 @@
 ### Sources
 
 - "Understanding GitHub Actions - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/learn-github-actions/understanding-github-actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions). Accessed 4 June 2022.
+- "About Workflows - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/about-workflows](https://docs.github.com/en/actions/using-workflows/about-workflows). Accessed 18 June 2022.
 
 ## Finding and customizing actions
 
@@ -196,3 +232,31 @@ jobs:
 
 - "Essential Features of GitHub Actions - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/learn-github-actions/essential-features-of-github-actions](https://docs.github.com/en/actions/learn-github-actions/essential-features-of-github-actions). Accessed 17 June 2022.
 - "Storing Workflow Data as Artifacts - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts). Accessed 17 June 2022.
+
+## About workflows
+
+### Using starter workflows
+
+- GitHub provides preconfigured starter workflow that you can customize to create your own continuous integration workflow
+- GitHub analyzes your code and shows you CI starter workflow that might be useful for your repository
+- See the [actions/starter-workflows](https://github.com/actions/starter-workflows) repository and [Creating starter workflows for your organization](https://docs.github.com/en/actions/using-workflows/creating-starter-workflows-for-your-organization)
+
+### Advanced workflow features
+
+#### Storing secrets
+
+- If your workflows use sensitive data, such as passwords or certificates, you can save these in GitHub as _secrets_ and then use them in your workflows as environment variables
+- Secrets are encrypted environment variables that you create in an organization, repository, or repository [environment](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment)
+- To create secrets for a repository:
+  - repository > Settings > Secrets > Actions > New repository secret
+- Secrets can also be created at the repository environment and organization levels
+- To provide an action with a secret as an input or environment variable, you can use the [`secrets` context](https://docs.github.com/en/actions/learn-github-actions/contexts#secrets-context) to access secrets you've created in your repository
+  - if a secret has not been set, the return value of an expression referencing the secret will be an empty string
+- See [`.github/workflows/workflow-secret.yml`](.github/workflows/workflow-secret.yml)
+
+### Sources
+
+- "About Workflows - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/about-workflows](https://docs.github.com/en/actions/using-workflows/about-workflows). Accessed 18 June 2022.
+- "Encrypted Secrets - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/security-guides/encrypted-secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Accessed 18 June 2022.
+
+‌
