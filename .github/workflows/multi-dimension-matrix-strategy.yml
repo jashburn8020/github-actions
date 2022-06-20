@@ -11,6 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Display product and OS
-        run: bash ./.github/scripts/product_os.sh
+        run: bash ./.github/scripts/prod_os.sh
         env:
           prod_version: ${{ matrix.version }}
