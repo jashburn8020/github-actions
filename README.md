@@ -252,11 +252,42 @@ jobs:
 - Secrets can also be created at the repository environment and organization levels
 - To provide an action with a secret as an input or environment variable, you can use the [`secrets` context](https://docs.github.com/en/actions/learn-github-actions/contexts#secrets-context) to access secrets you've created in your repository
   - if a secret has not been set, the return value of an expression referencing the secret will be an empty string
+- Note: GitHub automatically redacts secrets printed to the log, but you should avoid printing secrets to the log intentionally
 - See [`.github/workflows/workflow-secret.yml`](.github/workflows/workflow-secret.yml)
+
+#### Creating dependent jobs
+
+- By default, the jobs in your workflow all run in parallel at the same time
+- If you have a job that must only run after another job has completed, use the `needs` keyword to create this dependency
+  - if one of the jobs fails, all dependent jobs are skipped
+  - if you need the jobs to continue, use the `if` conditional statement
+
+```yml
+jobs:
+  job1:
+  job2:
+    needs: job1
+  job3:
+    # Always run after job1 and job2 have completed, regardless of whether they were successful
+    if: ${{ always() }}
+    needs: [job1, job2]
+```
+
+### Using a matrix
+
+- A matrix strategy lets you use variables in a single job definition to automatically create multiple job runs that are based the combinations of the variables
+  - e.g., to test your code in multiple versions of a language or operating systems
+  - created using the **`strategy`** keyword, which receives the build options as an array
+- By default, GitHub will maximize the number of jobs run in parallel depending on runner availability
+- The order of the variables in the matrix determines the order in which the jobs are created
+  - unless you specify a maximum using [`max-parallel`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymax-parallel)
+- The variables that you define become properties in the [`matrix` context](https://docs.github.com/en/actions/learn-github-actions/contexts#matrix-context)
+- See [`.github/workflows/multi-dimension-matrix-strategy.yml`](.github/workflows/multi-dimension-matrix-strategy.yml)
 
 ### Sources
 
 - "About Workflows - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/about-workflows](https://docs.github.com/en/actions/using-workflows/about-workflows). Accessed 18 June 2022.
 - "Encrypted Secrets - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/security-guides/encrypted-secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Accessed 18 June 2022.
-
-‌
+- "Using Jobs in a Workflow - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow). Accessed 19 June 2022.
+- "Using a Matrix for Your Jobs - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). Accessed 20 June 2022.
+  ‌

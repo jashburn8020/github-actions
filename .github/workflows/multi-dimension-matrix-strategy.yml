@@ -1,0 +1,16 @@
+name: Matrix strategy - multi-dimension matrix
+on:
+  workflow_dispatch
+jobs:
+  multi_dimension_matrix:
+    strategy:
+        matrix:
+          version: [1, 2, 3]
+          os: [ubuntu-20.04, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Display product and OS
+        run: bash ./.github/scripts/product_os.sh
+        env:
+          prod_version: ${{ matrix.version }}
