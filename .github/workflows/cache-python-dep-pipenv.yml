@@ -38,7 +38,7 @@ jobs:
 
       - name: Run test suite
         env:
-          cache-hit: ${{ steps.cache-pipenv.outputs.cache-hit }}
+          cachehit: ${{ steps.cache-pipenv.outputs.cache-hit }}
         run: |
-          echo $cache-hit
+          echo $cachehit
           pipenv run pytest
