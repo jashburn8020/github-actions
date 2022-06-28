@@ -1,0 +1,43 @@
+name: Cache Python dependencies that are managed through pipenv
+on:
+  workflow_dispatch
+jobs:
+  cache_and_test:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      - name: Install pipenv
+        run: pipx install pipenv
+
+      # Use cache action instead of setup-python's built-in cache functionality as an
+      # example.
+      - name: Cache Python modules
+        id: cache-pipenv
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pipenv-modules
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}
+          # runner.os: new cache when the runner's OS changes
+          # hashFiles('**/Pipfile.lock'): new cache when dependencies change
+        run: |
+          echo "key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}"
+
+      - name: Install dependencies
+        # If there is a cache miss, the cache-hit output is set to false
+        if: ${{ steps.cache-pipenv.outputs.cache-hit == 'false' }}
+        run: |
+          echo "Installing dependencies..."
+          pipenv install
+
+      - name: Run test suite
+        run: |
+          pipenv run pytest

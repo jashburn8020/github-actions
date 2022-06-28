@@ -27,6 +27,8 @@
     - [Using starter workflows](#using-starter-workflows)
     - [Advanced workflow features](#advanced-workflow-features)
       - [Storing secrets](#storing-secrets)
+      - [Creating dependent jobs](#creating-dependent-jobs)
+      - [Using a matrix](#using-a-matrix)
     - [Sources](#sources-3)
 
 ## Understanding GitHub Actions
@@ -273,16 +275,48 @@ jobs:
     needs: [job1, job2]
 ```
 
-### Using a matrix
+#### Using a matrix
 
 - A matrix strategy lets you use variables in a single job definition to automatically create multiple job runs that are based the combinations of the variables
   - e.g., to test your code in multiple versions of a language or operating systems
   - created using the **`strategy`** keyword, which receives the build options as an array
 - By default, GitHub will maximize the number of jobs run in parallel depending on runner availability
-- The order of the variables in the matrix determines the order in which the jobs are created
   - unless you specify a maximum using [`max-parallel`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstrategymax-parallel)
+- The order of the variables in the matrix determines the order in which the jobs are created
 - The variables that you define become properties in the [`matrix` context](https://docs.github.com/en/actions/learn-github-actions/contexts#matrix-context)
 - See [`.github/workflows/multi-dimension-matrix-strategy.yml`](.github/workflows/multi-dimension-matrix-strategy.yml)
+
+### Caching dependencies
+
+- To cache dependencies for a job, use GitHub's [`cache` action](https://github.com/actions/cache)
+  - creates and restores a cache identified by a unique key
+  - once the cache is created, it is available to all workflows in the same repository
+- Alternatively, if you are caching the package managers listed below, using their respective setup-\* actions requires minimal configuration and will create and restore dependency caches for you
+  - npm, yarn, pnpm: [setup-node](https://github.com/actions/setup-node#caching-global-packages-data)
+  - pip, pipenv, poetry: [setup-python](https://github.com/actions/setup-python#caching-packages-dependencies)
+  - gradle, maven: [setup-java](https://github.com/actions/setup-java#caching-packages-dependencies)
+  - ruby gems: [setup-ruby](https://github.com/ruby/setup-ruby#caching-bundle-install-automatically)
+- Comparing artifacts and dependency caching
+  - use caching when you want to reuse files that don't change often between jobs or workflow runs, such as build dependencies from a package management system
+  - use artifacts when you want to save files produced by a job to view after a workflow run has ended, such as built binaries or build logs
+- The `cache` action will attempt to restore a cache based on the `key` you provide
+  - when `key` matches an existing cache (cache hit), and the action restores the cached files to the `path` directory
+  - if there is no exact match
+    - the action automatically creates a new cache if the job completes successfully
+      - the new cache will use the `key` you provided and contains the files you specify in `path`
+    - you can optionally provide a list of `restore-keys`
+      - useful when you are restoring a cache from another branch because `restore-keys` can partially match cache keys
+      - a list of alternate restore keys
+      - ordered from the most specific to least specific - `cache` action searches in sequential order
+      - when a key doesn't match directly, the action searches for keys prefixed with the restore key
+      - if there are multiple partial matches for a restore key, the action returns the most recently created cache
+    - you can create a key using an expression that calculates the hash of a file that declares the project dependencies (e.g., `package-lock.json` and `Pipfile.lock`)
+      - when the dependencies change, the cache key changes and a new cache is automatically created
+      - e.g., `hashFiles('**/Pipfile.lock')`
+- Usage limits and eviction policy
+  - GitHub will remove any cache entries that have not been accessed in over 7 days
+  - no limit on the number of caches you can store, but the total size of all caches in a repository is limited to 10 GB
+    - if you exceed the limit, GitHub will save the new cache but will begin evicting caches until the total size is less than the repository limit
 
 ### Sources
 
@@ -290,4 +324,4 @@ jobs:
 - "Encrypted Secrets - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/security-guides/encrypted-secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Accessed 18 June 2022.
 - "Using Jobs in a Workflow - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow). Accessed 19 June 2022.
 - "Using a Matrix for Your Jobs - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). Accessed 20 June 2022.
-  ‌
+- "Caching Dependencies to Speed up Workflows - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows). Accessed 27 June 2022.
