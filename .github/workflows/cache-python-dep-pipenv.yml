@@ -28,8 +28,6 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}
           # runner.os: new cache when the runner's OS changes
           # hashFiles('**/Pipfile.lock'): new cache when dependencies change
-        run: |
-          echo "key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}"
 
       - name: Install dependencies
         # If there is a cache miss, the cache-hit output is set to false
@@ -40,4 +38,5 @@ jobs:
 
       - name: Run test suite
         run: |
+          echo "key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}"
           pipenv run pytest
