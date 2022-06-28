@@ -37,6 +37,8 @@ jobs:
           pipenv install
 
       - name: Run test suite
+        env:
+          cache-hit: ${{ steps.cache-pipenv.outputs.cache-hit }}
         run: |
-          echo "key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}"
+          echo $cache-hit
           pipenv run pytest
