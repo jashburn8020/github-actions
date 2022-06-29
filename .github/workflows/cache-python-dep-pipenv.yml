@@ -31,7 +31,7 @@ jobs:
 
       - name: Install dependencies
         # If there is a cache miss, the cache-hit output is set to false
-        if: ${{ steps.cache-pipenv.outputs.cache-hit == 'false' }}
+        #if: ${{ steps.cache-pipenv.outputs.cache-hit == 'false' }}
         run: |
           echo "Installing dependencies..."
           pipenv install
