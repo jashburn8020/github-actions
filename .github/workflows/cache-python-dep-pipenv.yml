@@ -34,7 +34,7 @@ jobs:
         #if: ${{ steps.cache-pipenv.outputs.cache-hit == 'false' }}
         run: |
           echo "Installing dependencies..."
-          pipenv install
+          pipenv install --dev
 
       - name: Run test suite
         env:
