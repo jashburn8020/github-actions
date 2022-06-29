@@ -25,20 +25,20 @@ jobs:
           cache-name: cache-pipenv-modules
         with:
           path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}
           # runner.os: new cache when the runner's OS changes
           # hashFiles('**/Pipfile.lock'): new cache when dependencies change
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}
 
-      - name: Install dependencies
-        # If there is a cache miss, the cache-hit output is set to false
-        #if: ${{ steps.cache-pipenv.outputs.cache-hit == 'false' }}
-        run: |
-          echo "Installing dependencies..."
-          pipenv install --dev
-
-      - name: Run test suite
+      - name: List dependencies
         env:
+          # If there is a cache miss, the cache-hit output is set to false
           cachehit: ${{ steps.cache-pipenv.outputs.cache-hit }}
         run: |
-          echo $cachehit
-          pipenv run pytest
+          echo "cache-hit: $cachehit"
+          pipenv graph
+
+      - name: Install dependencies
+        run: pipenv install --dev
+
+      - name: Run test suite
+        run: pipenv run pytest
