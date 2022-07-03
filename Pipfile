@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 emoji = "*"
+github-actions-jashburn8020 = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"
-github-actions-jashburn8020 = {editable = true, path = "."}
 
 [requires]
 python_version = "3.8"

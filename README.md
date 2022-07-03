@@ -10,6 +10,7 @@
       - [Runners](#runners)
     - [Create an example workflow](#create-an-example-workflow)
     - [Viewing the activity for a workflow run](#viewing-the-activity-for-a-workflow-run)
+    - [Workflows on non-default branch](#workflows-on-non-default-branch)
     - [Sources](#sources)
   - [Finding and customizing actions](#finding-and-customizing-actions)
     - [Adding an action to your workflow](#adding-an-action-to-your-workflow)
@@ -29,6 +30,11 @@
       - [Storing secrets](#storing-secrets)
       - [Creating dependent jobs](#creating-dependent-jobs)
       - [Using a matrix](#using-a-matrix)
+      - [Caching dependencies](#caching-dependencies)
+        - [Step: Cache Python modules](#step-cache-python-modules)
+        - [Step: List dependencies](#step-list-dependencies)
+        - [Step: Install dependencies](#step-install-dependencies)
+        - [Step: Post Cache Python modules](#step-post-cache-python-modules)
     - [Sources](#sources-3)
 
 ## Understanding GitHub Actions
@@ -123,10 +129,22 @@
 - When your workflow is triggered, a **workflow run** is created that executes the workflow
 - You can see a visualization graph of the run's progress and view each step's activity
 
+### Workflows on non-default branch
+
+- A new workflow only appears in the Actions tab when it is in the default (`main`) branch
+  - causes difficulties when creating/updating workflows that are not yet ready to be merged into the default branch
+- Workaround:
+  - create a dummy workflow in the default branch (if working on a new workflow)
+  - have a workflow of the same name in your working/feature branch
+  - trigger the workflow against your working branch to test it
+    - e.g., if using the `workflow_dispatch` event (i.e., triggering the workflow manually), when you "Run workflow" in the Actions tab, select the working branch to run the workflow
+  - merge to the default branch when the workflow is ready
+
 ### Sources
 
 - "Understanding GitHub Actions - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/learn-github-actions/understanding-github-actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions). Accessed 4 June 2022.
 - "About Workflows - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/about-workflows](https://docs.github.com/en/actions/using-workflows/about-workflows). Accessed 18 June 2022.
+- "Workflow Files Only Picked up from Master?" _GitHub Community_, 8 Oct. 2021, [github.community/t/workflow-files-only-picked-up-from-master/16129/43](https://github.community/t/workflow-files-only-picked-up-from-master/16129/43). Accessed 30 June 2022.
 
 ## Finding and customizing actions
 
@@ -286,7 +304,7 @@ jobs:
 - The variables that you define become properties in the [`matrix` context](https://docs.github.com/en/actions/learn-github-actions/contexts#matrix-context)
 - See [`.github/workflows/multi-dimension-matrix-strategy.yml`](.github/workflows/multi-dimension-matrix-strategy.yml)
 
-### Caching dependencies
+#### Caching dependencies
 
 - To cache dependencies for a job, use GitHub's [`cache` action](https://github.com/actions/cache)
   - creates and restores a cache identified by a unique key
@@ -317,6 +335,81 @@ jobs:
   - GitHub will remove any cache entries that have not been accessed in over 7 days
   - no limit on the number of caches you can store, but the total size of all caches in a repository is limited to 10 GB
     - if you exceed the limit, GitHub will save the new cache but will begin evicting caches until the total size is less than the repository limit
+- See [`.github/workflows/cache-python-dep-pipenv.yml`](.github/workflows/cache-python-dep-pipenv.yml)
+- Example log output
+
+##### Step: Cache Python modules
+
+Cache miss
+
+```log
+2022-07-02T16:25:54.2608143Z ##[group]Run actions/cache@v3
+[...]
+2022-07-02T16:25:54.2611028Z ##[endgroup]
+2022-07-02T16:25:54.8210510Z Cache not found for input keys: Linux-pipenv-build01-1594[...]8899
+```
+
+Cache hit
+
+```log
+2022-07-02T17:02:00.2217749Z ##[group]Run actions/cache@v3
+[...]
+2022-07-02T17:02:00.2220125Z ##[endgroup]
+2022-07-02T17:02:00.8606639Z Received 4435692 of 4435692 (100.0%), 20.8 MBs/sec
+2022-07-02T17:02:00.8610229Z Cache Size: ~4 MB (4435692 B)
+[...]
+2022-07-02T17:02:00.9634558Z Cache restored from key: Linux-pipenv-build01-1594[...]8899
+```
+
+##### Step: List dependencies
+
+Cache miss - _Skipped_
+
+Cache hit
+
+```log
+2022-07-02T17:02:00.9767086Z ##[group]Run pipenv graph
+[...]
+2022-07-02T17:02:00.9823164Z ##[endgroup]
+2022-07-02T17:02:06.1372912Z emoji==1.7.0
+2022-07-02T17:02:06.1373607Z pytest==7.1.2
+[...]
+```
+
+##### Step: Install dependencies
+
+Cache miss
+
+```log
+2022-07-02T16:25:54.8394214Z ##[group]Run pipenv install --dev
+[...]
+2022-07-02T16:25:57.2014746Z Creating a virtualenv for this project...
+[...]
+2022-07-02T16:26:00.2200155Z Virtualenv location: /home/runner/.local/share/virtualenvs/github-actions-cExMZdSA
+2022-07-02T16:26:00.2941016Z Installing dependencies from Pipfile.lock (0a4f0e)...
+2022-07-02T16:26:16.3125361Z To activate this project's virtualenv, run pipenv shell.
+2022-07-02T16:26:16.3126114Z Alternatively, run a command inside the virtualenv with pipenv run.
+```
+
+Cache hit - _Skipped_
+
+##### Step: Post Cache Python modules
+
+Cache miss
+
+```log
+022-07-02T16:26:17.8861873Z Post job cleanup.
+2022-07-02T16:26:18.8555136Z Cache Size: ~4 MB (4435692 B)
+2022-07-02T16:26:18.9992326Z Cache saved successfully
+2022-07-02T16:26:19.0007627Z Cache saved with key: Linux-pipenv-build01-1594[...]8899
+```
+
+Cache hit
+
+```log
+2022-07-02T17:02:07.4403092Z Post job cleanup.
+2022-07-02T17:02:07.5894071Z Cache hit occurred on the primary key Linux-pipenv-build01-1594[...]8899, not saving cache.
+```
 
 ### Sources
 
@@ -325,3 +418,4 @@ jobs:
 - "Using Jobs in a Workflow - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow](https://docs.github.com/en/actions/using-jobs/using-jobs-in-a-workflow). Accessed 19 June 2022.
 - "Using a Matrix for Your Jobs - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs). Accessed 20 June 2022.
 - "Caching Dependencies to Speed up Workflows - GitHub Docs." _GitHub Docs_, 2022, [docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows). Accessed 27 June 2022.
+- "PyTest with GitHub Actions." _Dennisokeeffe.com_, 2021, [blog.dennisokeeffe.com/blog/2021-08-08-pytest-with-github-actions](https://blog.dennisokeeffe.com/blog/2021-08-08-pytest-with-github-actions). Accessed 30 June 2022.

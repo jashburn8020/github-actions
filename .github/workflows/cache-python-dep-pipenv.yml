@@ -1,6 +1,12 @@
 name: Cache Python dependencies that are managed through pipenv
 on:
-  workflow_dispatch
+  workflow_dispatch:
+    inputs:
+      cachekey_unique:
+        description: "String for cache key to trigger cache miss"
+        type: string
+        required: true
+        default: "build"
 jobs:
   cache_and_test:
     runs-on: ubuntu-22.04
@@ -14,31 +20,33 @@ jobs:
           python-version: '3.8'
 
       - name: Install pipenv
-        run: pipx install pipenv
+        run: |
+          pipx install pipenv
 
-      # Use cache action instead of setup-python's built-in cache functionality as an
-      # example.
       - name: Cache Python modules
         id: cache-pipenv
+        # Use cache action instead of setup-python's built-in cache functionality as an
+        # example.
         uses: actions/cache@v3
-        env:
-          cache-name: cache-pipenv-modules
         with:
           path: ~/.local/share/virtualenvs
           # runner.os: new cache when the runner's OS changes
           # hashFiles('**/Pipfile.lock'): new cache when dependencies change
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/Pipfile.lock') }}
+          key: ${{ runner.os }}-pipenv-${{ inputs.cachekey_unique }}-${{ hashFiles('**/Pipfile.lock') }}
 
       - name: List dependencies
-        env:
-          # If there is a cache miss, the cache-hit output is set to false
-          cachehit: ${{ steps.cache-pipenv.outputs.cache-hit }}
+        # List dependencies only when there's a cache hit otherwise a virtualenv
+        # would not be available for `pipenv graph` to run.
+        if: ${{ steps.cache-pipenv.outputs.cache-hit == 'true' }}
         run: |
-          echo "cache-hit: $cachehit"
           pipenv graph
 
       - name: Install dependencies
-        run: pipenv install --dev
+        # Install dependencies only on cache miss.
+        if: ${{ steps.cache-pipenv.outputs.cache-hit != 'true' }}
+        run: |
+          pipenv install --dev
 
       - name: Run test suite
-        run: pipenv run pytest
+        run: |
+          pipenv run pytest

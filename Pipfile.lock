@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1325404440cc710d6c75d295cb1b5a42389db113ab8c384f1c79304fb985efb0"
+            "sha256": "5d4fbe1e49044895be22ff3beec79a8cd194015200d2d9aa69d0a675e20a4f0e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -22,6 +22,10 @@
             ],
             "index": "pypi",
             "version": "==1.7.0"
+        },
+        "github-actions-jashburn8020": {
+            "editable": true,
+            "path": "."
         }
     },
     "develop": {
@@ -32,10 +36,6 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==21.4.0"
-        },
-        "github-actions-jashburn8020": {
-            "editable": true,
-            "path": "."
         },
         "iniconfig": {
             "hashes": [
